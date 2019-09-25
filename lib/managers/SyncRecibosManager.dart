@@ -100,7 +100,8 @@ class SyncRecibosManager {
           telcob: cobrador.telefono,
           concepto: recibo.concepto,
           efectivo: recibo.efectivo,
-          requesttag: this.runtimeType.toString());
+          requesttag: this.runtimeType.toString()+ DateTime.now().toString(),
+          ladob: recibo.ladob);
       _sincsubject.add(LoadingState("Enviando recibo no. ${recibo.documento}"));
       try {
         var result = await _services.enviarRecibo(recibom);

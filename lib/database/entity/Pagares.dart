@@ -1,11 +1,11 @@
 import 'package:moor_flutter/moor_flutter.dart';
 
 class Pagares extends Table {
-  IntColumn get idpagare => integer()();
   TextColumn get prestamoid => text().withLength(max: 15)();
-  DateTimeColumn get fechavenc=>dateTime()();
+  IntColumn get idpagare => integer()();  
   IntColumn get pagare => integer()();
-  RealColumn get cuota => real()();
+  DateTimeColumn get fechavenc=>dateTime()();
+  RealColumn get monto => real()();
   RealColumn get capital => real()();
   RealColumn get interes => real()();
   RealColumn get comision => real()();

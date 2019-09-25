@@ -1,9 +1,7 @@
 import 'package:ds_appcobro/api/models/ImpresionReciboData.dart';
-import 'package:ds_appcobro/managers/PrinterManager.dart';
 import 'package:ds_appcobro/widgets/DsWidgetSelector.dart';
 import 'package:ds_appcobro/widgets/Loader.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class PrinterView extends StatefulWidget {
   final ImpresionReciboData impresionReciboData;
@@ -14,20 +12,18 @@ class PrinterView extends StatefulWidget {
 }
 
 class _PrinterViewState extends State<PrinterView> {
-  ImpresionReciboData _impresionReciboData;
-  PrinterManager _printerManager = PrinterManager();
+  //PrinterManager _printerManager = PrinterManager();
   bool _isloading = false;
   bool _haserror = false;
   String _mensaje = '';
   @override
   void initState() {
     super.initState();
-    _impresionReciboData = widget.impresionReciboData;
     printRecibo();
   }
 
   void printRecibo() async {
-    setState(() {
+    /*setState(() {
       _haserror = false;
       _isloading = true;
       _mensaje = 'Imprimiendo recibo ...';
@@ -50,7 +46,7 @@ class _PrinterViewState extends State<PrinterView> {
         _haserror = true;
         _mensaje = ex.toString();
       });
-    }
+    }*/
   }
 
   @override

@@ -25,7 +25,10 @@ class RecibosServices {
           var errjson = jsonDecode(response.body);
           errresponse = ErrorResponse.fromjson(errjson);
         } catch (ex) {
-          throw DsException(0, ex.toString());
+          throw DsException(0, response.body.toString());
+        }
+        if(errresponse.code==null){
+          throw DsException(0, response.body.toString());
         }
         throw DsException(errresponse.code, errresponse.type='\n'+errresponse.message);
       } else {

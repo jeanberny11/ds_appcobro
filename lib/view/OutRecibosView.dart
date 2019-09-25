@@ -15,11 +15,10 @@ class OutRecibosView extends StatelessWidget {
       body: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-        child: StreamBuilder<List<Prestamo>>(
-          stream:
-              Provider.of<PrestamosDao>(context).watchAllPrestamosNoCobrados(),
+        child: FutureBuilder<List<Prestamo>>(
+          future: Provider.of<PrestamosDao>(context).getPrestamosNoCobrados(),
           builder: (context, snp) {
-            if (snp.connectionState == ConnectionState.active) {
+            if (snp.connectionState == ConnectionState.done) {
               var list = snp.data;
               return CustomScrollView(
                 slivers: <Widget>[
@@ -34,10 +33,12 @@ class OutRecibosView extends StatelessWidget {
                     actions: <Widget>[
                       IconButton(
                         icon: Icon(Icons.search),
-                        onPressed: ()async {
-                          var list=await Provider.of<PrestamosDao>(context).getAllPrestamosNoCobrados();
+                        onPressed: () async {
+                          var list=await Provider.of<PrestamosDao>(context).getPrestamosNoCobrados();
                           var prestamo=await showSearch<Prestamo>(context: context,delegate: PrestamoSearch(list));
-                          Navigator.of(context).pushReplacementNamed(PageRoutes.cobro,arguments: prestamo);
+                          if(prestamo!=null){
+                            Navigator.of(context).pushReplacementNamed(PageRoutes.cobro,arguments: prestamo);
+                          }
                         },
                       )
                     ],
@@ -72,8 +73,10 @@ class OutRecibosView extends StatelessWidget {
                               )
                             ],
                           ),
-                          onTap: (){
-                            Navigator.of(context).pushReplacementNamed(PageRoutes.cobro,arguments: list[index]);
+                          onTap: () {
+                            Navigator.of(context).pushReplacementNamed(
+                                PageRoutes.cobro,
+                                arguments: list[index]);
                           },
                         );
                       }, childCount: list.length),
@@ -136,7 +139,7 @@ class PrestamoSearch extends SearchDelegate<Prestamo> {
         itemCount: result.length,
         itemBuilder: (context, index) {
           return ListTile(
-            onTap: (){
+            onTap: () {
               close(context, result[index]);
             },
             leading: CircleAvatar(
@@ -191,8 +194,7 @@ class PrestamoSearch extends SearchDelegate<Prestamo> {
           title: Text(list[index].prestamoid),
           subtitle: Text(list[index].nombre),
           onTap: () {
-            query = list[index].prestamoid;
-            showResults(context);
+            close(context, list[index]);
           },
         );
       },

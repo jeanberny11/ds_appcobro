@@ -18,7 +18,8 @@ class PageRoutes{
   static const String bluetoothpicker='/bluetoothpickerroute';
   static const String secuencia='/secuenciaroute';
   static const String insecuencia='/insecuenciaroute';
-  static const String outrecibos='/outrecibosroute';  
+  static const String outallpresrecibos='/outallpresrecibos';  
   static const String printrecibo='/PrintReciboRoute';  
   static const String recibosnoenviados='/recibosnoenviados';
+  static const String cobroprovider='/cobroprovider';
 }

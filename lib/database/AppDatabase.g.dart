@@ -999,22 +999,22 @@ class $MenuOptionsTable extends MenuOptions
 }
 
 class Pagare extends DataClass implements Insertable<Pagare> {
-  final int idpagare;
   final String prestamoid;
-  final DateTime fechavenc;
+  final int idpagare;
   final int pagare;
-  final double cuota;
+  final DateTime fechavenc;
+  final double monto;
   final double capital;
   final double interes;
   final double comision;
   final double mora;
   final double balance;
   Pagare(
-      {@required this.idpagare,
-      @required this.prestamoid,
-      @required this.fechavenc,
+      {@required this.prestamoid,
+      @required this.idpagare,
       @required this.pagare,
-      @required this.cuota,
+      @required this.fechavenc,
+      @required this.monto,
       @required this.capital,
       @required this.interes,
       @required this.comision,
@@ -1023,20 +1023,20 @@ class Pagare extends DataClass implements Insertable<Pagare> {
   factory Pagare.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String prefix}) {
     final effectivePrefix = prefix ?? '';
-    final intType = db.typeSystem.forDartType<int>();
     final stringType = db.typeSystem.forDartType<String>();
+    final intType = db.typeSystem.forDartType<int>();
     final dateTimeType = db.typeSystem.forDartType<DateTime>();
     final doubleType = db.typeSystem.forDartType<double>();
     return Pagare(
-      idpagare:
-          intType.mapFromDatabaseResponse(data['${effectivePrefix}idpagare']),
       prestamoid: stringType
           .mapFromDatabaseResponse(data['${effectivePrefix}prestamoid']),
+      idpagare:
+          intType.mapFromDatabaseResponse(data['${effectivePrefix}idpagare']),
+      pagare: intType.mapFromDatabaseResponse(data['${effectivePrefix}pagare']),
       fechavenc: dateTimeType
           .mapFromDatabaseResponse(data['${effectivePrefix}fechavenc']),
-      pagare: intType.mapFromDatabaseResponse(data['${effectivePrefix}pagare']),
-      cuota:
-          doubleType.mapFromDatabaseResponse(data['${effectivePrefix}cuota']),
+      monto:
+          doubleType.mapFromDatabaseResponse(data['${effectivePrefix}monto']),
       capital:
           doubleType.mapFromDatabaseResponse(data['${effectivePrefix}capital']),
       interes:
@@ -1051,11 +1051,11 @@ class Pagare extends DataClass implements Insertable<Pagare> {
   factory Pagare.fromJson(Map<String, dynamic> json,
       {ValueSerializer serializer = const ValueSerializer.defaults()}) {
     return Pagare(
-      idpagare: serializer.fromJson<int>(json['idpagare']),
       prestamoid: serializer.fromJson<String>(json['prestamoid']),
-      fechavenc: serializer.fromJson<DateTime>(json['fechavenc']),
+      idpagare: serializer.fromJson<int>(json['idpagare']),
       pagare: serializer.fromJson<int>(json['pagare']),
-      cuota: serializer.fromJson<double>(json['cuota']),
+      fechavenc: serializer.fromJson<DateTime>(json['fechavenc']),
+      monto: serializer.fromJson<double>(json['monto']),
       capital: serializer.fromJson<double>(json['capital']),
       interes: serializer.fromJson<double>(json['interes']),
       comision: serializer.fromJson<double>(json['comision']),
@@ -1067,11 +1067,11 @@ class Pagare extends DataClass implements Insertable<Pagare> {
   Map<String, dynamic> toJson(
       {ValueSerializer serializer = const ValueSerializer.defaults()}) {
     return {
-      'idpagare': serializer.toJson<int>(idpagare),
       'prestamoid': serializer.toJson<String>(prestamoid),
-      'fechavenc': serializer.toJson<DateTime>(fechavenc),
+      'idpagare': serializer.toJson<int>(idpagare),
       'pagare': serializer.toJson<int>(pagare),
-      'cuota': serializer.toJson<double>(cuota),
+      'fechavenc': serializer.toJson<DateTime>(fechavenc),
+      'monto': serializer.toJson<double>(monto),
       'capital': serializer.toJson<double>(capital),
       'interes': serializer.toJson<double>(interes),
       'comision': serializer.toJson<double>(comision),
@@ -1083,19 +1083,19 @@ class Pagare extends DataClass implements Insertable<Pagare> {
   @override
   T createCompanion<T extends UpdateCompanion<Pagare>>(bool nullToAbsent) {
     return PagaresCompanion(
-      idpagare: idpagare == null && nullToAbsent
-          ? const Value.absent()
-          : Value(idpagare),
       prestamoid: prestamoid == null && nullToAbsent
           ? const Value.absent()
           : Value(prestamoid),
+      idpagare: idpagare == null && nullToAbsent
+          ? const Value.absent()
+          : Value(idpagare),
+      pagare:
+          pagare == null && nullToAbsent ? const Value.absent() : Value(pagare),
       fechavenc: fechavenc == null && nullToAbsent
           ? const Value.absent()
           : Value(fechavenc),
-      pagare:
-          pagare == null && nullToAbsent ? const Value.absent() : Value(pagare),
-      cuota:
-          cuota == null && nullToAbsent ? const Value.absent() : Value(cuota),
+      monto:
+          monto == null && nullToAbsent ? const Value.absent() : Value(monto),
       capital: capital == null && nullToAbsent
           ? const Value.absent()
           : Value(capital),
@@ -1113,22 +1113,22 @@ class Pagare extends DataClass implements Insertable<Pagare> {
   }
 
   Pagare copyWith(
-          {int idpagare,
-          String prestamoid,
-          DateTime fechavenc,
+          {String prestamoid,
+          int idpagare,
           int pagare,
-          double cuota,
+          DateTime fechavenc,
+          double monto,
           double capital,
           double interes,
           double comision,
           double mora,
           double balance}) =>
       Pagare(
-        idpagare: idpagare ?? this.idpagare,
         prestamoid: prestamoid ?? this.prestamoid,
-        fechavenc: fechavenc ?? this.fechavenc,
+        idpagare: idpagare ?? this.idpagare,
         pagare: pagare ?? this.pagare,
-        cuota: cuota ?? this.cuota,
+        fechavenc: fechavenc ?? this.fechavenc,
+        monto: monto ?? this.monto,
         capital: capital ?? this.capital,
         interes: interes ?? this.interes,
         comision: comision ?? this.comision,
@@ -1138,11 +1138,11 @@ class Pagare extends DataClass implements Insertable<Pagare> {
   @override
   String toString() {
     return (StringBuffer('Pagare(')
-          ..write('idpagare: $idpagare, ')
           ..write('prestamoid: $prestamoid, ')
-          ..write('fechavenc: $fechavenc, ')
+          ..write('idpagare: $idpagare, ')
           ..write('pagare: $pagare, ')
-          ..write('cuota: $cuota, ')
+          ..write('fechavenc: $fechavenc, ')
+          ..write('monto: $monto, ')
           ..write('capital: $capital, ')
           ..write('interes: $interes, ')
           ..write('comision: $comision, ')
@@ -1161,11 +1161,11 @@ class Pagare extends DataClass implements Insertable<Pagare> {
                       $mrjc(
                           $mrjc(
                               $mrjc(
-                                  $mrjc($mrjc(0, idpagare.hashCode),
-                                      prestamoid.hashCode),
-                                  fechavenc.hashCode),
-                              pagare.hashCode),
-                          cuota.hashCode),
+                                  $mrjc($mrjc(0, prestamoid.hashCode),
+                                      idpagare.hashCode),
+                                  pagare.hashCode),
+                              fechavenc.hashCode),
+                          monto.hashCode),
                       capital.hashCode),
                   interes.hashCode),
               comision.hashCode),
@@ -1175,11 +1175,11 @@ class Pagare extends DataClass implements Insertable<Pagare> {
   bool operator ==(other) =>
       identical(this, other) ||
       (other is Pagare &&
-          other.idpagare == idpagare &&
           other.prestamoid == prestamoid &&
-          other.fechavenc == fechavenc &&
+          other.idpagare == idpagare &&
           other.pagare == pagare &&
-          other.cuota == cuota &&
+          other.fechavenc == fechavenc &&
+          other.monto == monto &&
           other.capital == capital &&
           other.interes == interes &&
           other.comision == comision &&
@@ -1188,22 +1188,22 @@ class Pagare extends DataClass implements Insertable<Pagare> {
 }
 
 class PagaresCompanion extends UpdateCompanion<Pagare> {
-  final Value<int> idpagare;
   final Value<String> prestamoid;
-  final Value<DateTime> fechavenc;
+  final Value<int> idpagare;
   final Value<int> pagare;
-  final Value<double> cuota;
+  final Value<DateTime> fechavenc;
+  final Value<double> monto;
   final Value<double> capital;
   final Value<double> interes;
   final Value<double> comision;
   final Value<double> mora;
   final Value<double> balance;
   const PagaresCompanion({
-    this.idpagare = const Value.absent(),
     this.prestamoid = const Value.absent(),
-    this.fechavenc = const Value.absent(),
+    this.idpagare = const Value.absent(),
     this.pagare = const Value.absent(),
-    this.cuota = const Value.absent(),
+    this.fechavenc = const Value.absent(),
+    this.monto = const Value.absent(),
     this.capital = const Value.absent(),
     this.interes = const Value.absent(),
     this.comision = const Value.absent(),
@@ -1216,18 +1216,6 @@ class $PagaresTable extends Pagares with TableInfo<$PagaresTable, Pagare> {
   final GeneratedDatabase _db;
   final String _alias;
   $PagaresTable(this._db, [this._alias]);
-  final VerificationMeta _idpagareMeta = const VerificationMeta('idpagare');
-  GeneratedIntColumn _idpagare;
-  @override
-  GeneratedIntColumn get idpagare => _idpagare ??= _constructIdpagare();
-  GeneratedIntColumn _constructIdpagare() {
-    return GeneratedIntColumn(
-      'idpagare',
-      $tableName,
-      false,
-    );
-  }
-
   final VerificationMeta _prestamoidMeta = const VerificationMeta('prestamoid');
   GeneratedTextColumn _prestamoid;
   @override
@@ -1237,13 +1225,13 @@ class $PagaresTable extends Pagares with TableInfo<$PagaresTable, Pagare> {
         maxTextLength: 15);
   }
 
-  final VerificationMeta _fechavencMeta = const VerificationMeta('fechavenc');
-  GeneratedDateTimeColumn _fechavenc;
+  final VerificationMeta _idpagareMeta = const VerificationMeta('idpagare');
+  GeneratedIntColumn _idpagare;
   @override
-  GeneratedDateTimeColumn get fechavenc => _fechavenc ??= _constructFechavenc();
-  GeneratedDateTimeColumn _constructFechavenc() {
-    return GeneratedDateTimeColumn(
-      'fechavenc',
+  GeneratedIntColumn get idpagare => _idpagare ??= _constructIdpagare();
+  GeneratedIntColumn _constructIdpagare() {
+    return GeneratedIntColumn(
+      'idpagare',
       $tableName,
       false,
     );
@@ -1261,13 +1249,25 @@ class $PagaresTable extends Pagares with TableInfo<$PagaresTable, Pagare> {
     );
   }
 
-  final VerificationMeta _cuotaMeta = const VerificationMeta('cuota');
-  GeneratedRealColumn _cuota;
+  final VerificationMeta _fechavencMeta = const VerificationMeta('fechavenc');
+  GeneratedDateTimeColumn _fechavenc;
   @override
-  GeneratedRealColumn get cuota => _cuota ??= _constructCuota();
-  GeneratedRealColumn _constructCuota() {
+  GeneratedDateTimeColumn get fechavenc => _fechavenc ??= _constructFechavenc();
+  GeneratedDateTimeColumn _constructFechavenc() {
+    return GeneratedDateTimeColumn(
+      'fechavenc',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _montoMeta = const VerificationMeta('monto');
+  GeneratedRealColumn _monto;
+  @override
+  GeneratedRealColumn get monto => _monto ??= _constructMonto();
+  GeneratedRealColumn _constructMonto() {
     return GeneratedRealColumn(
-      'cuota',
+      'monto',
       $tableName,
       false,
     );
@@ -1335,11 +1335,11 @@ class $PagaresTable extends Pagares with TableInfo<$PagaresTable, Pagare> {
 
   @override
   List<GeneratedColumn> get $columns => [
-        idpagare,
         prestamoid,
-        fechavenc,
+        idpagare,
         pagare,
-        cuota,
+        fechavenc,
+        monto,
         capital,
         interes,
         comision,
@@ -1356,23 +1356,17 @@ class $PagaresTable extends Pagares with TableInfo<$PagaresTable, Pagare> {
   VerificationContext validateIntegrity(PagaresCompanion d,
       {bool isInserting = false}) {
     final context = VerificationContext();
-    if (d.idpagare.present) {
-      context.handle(_idpagareMeta,
-          idpagare.isAcceptableValue(d.idpagare.value, _idpagareMeta));
-    } else if (idpagare.isRequired && isInserting) {
-      context.missing(_idpagareMeta);
-    }
     if (d.prestamoid.present) {
       context.handle(_prestamoidMeta,
           prestamoid.isAcceptableValue(d.prestamoid.value, _prestamoidMeta));
     } else if (prestamoid.isRequired && isInserting) {
       context.missing(_prestamoidMeta);
     }
-    if (d.fechavenc.present) {
-      context.handle(_fechavencMeta,
-          fechavenc.isAcceptableValue(d.fechavenc.value, _fechavencMeta));
-    } else if (fechavenc.isRequired && isInserting) {
-      context.missing(_fechavencMeta);
+    if (d.idpagare.present) {
+      context.handle(_idpagareMeta,
+          idpagare.isAcceptableValue(d.idpagare.value, _idpagareMeta));
+    } else if (idpagare.isRequired && isInserting) {
+      context.missing(_idpagareMeta);
     }
     if (d.pagare.present) {
       context.handle(
@@ -1380,11 +1374,17 @@ class $PagaresTable extends Pagares with TableInfo<$PagaresTable, Pagare> {
     } else if (pagare.isRequired && isInserting) {
       context.missing(_pagareMeta);
     }
-    if (d.cuota.present) {
+    if (d.fechavenc.present) {
+      context.handle(_fechavencMeta,
+          fechavenc.isAcceptableValue(d.fechavenc.value, _fechavencMeta));
+    } else if (fechavenc.isRequired && isInserting) {
+      context.missing(_fechavencMeta);
+    }
+    if (d.monto.present) {
       context.handle(
-          _cuotaMeta, cuota.isAcceptableValue(d.cuota.value, _cuotaMeta));
-    } else if (cuota.isRequired && isInserting) {
-      context.missing(_cuotaMeta);
+          _montoMeta, monto.isAcceptableValue(d.monto.value, _montoMeta));
+    } else if (monto.isRequired && isInserting) {
+      context.missing(_montoMeta);
     }
     if (d.capital.present) {
       context.handle(_capitalMeta,
@@ -1430,20 +1430,20 @@ class $PagaresTable extends Pagares with TableInfo<$PagaresTable, Pagare> {
   @override
   Map<String, Variable> entityToSql(PagaresCompanion d) {
     final map = <String, Variable>{};
-    if (d.idpagare.present) {
-      map['idpagare'] = Variable<int, IntType>(d.idpagare.value);
-    }
     if (d.prestamoid.present) {
       map['prestamoid'] = Variable<String, StringType>(d.prestamoid.value);
     }
-    if (d.fechavenc.present) {
-      map['fechavenc'] = Variable<DateTime, DateTimeType>(d.fechavenc.value);
+    if (d.idpagare.present) {
+      map['idpagare'] = Variable<int, IntType>(d.idpagare.value);
     }
     if (d.pagare.present) {
       map['pagare'] = Variable<int, IntType>(d.pagare.value);
     }
-    if (d.cuota.present) {
-      map['cuota'] = Variable<double, RealType>(d.cuota.value);
+    if (d.fechavenc.present) {
+      map['fechavenc'] = Variable<DateTime, DateTimeType>(d.fechavenc.value);
+    }
+    if (d.monto.present) {
+      map['monto'] = Variable<double, RealType>(d.monto.value);
     }
     if (d.capital.present) {
       map['capital'] = Variable<double, RealType>(d.capital.value);
@@ -1473,12 +1473,18 @@ class Prestamo extends DataClass implements Insertable<Prestamo> {
   final String prestamoid;
   final int idprestamo;
   final int idcliente;
-  final String nombre;
-  final String direccion;
+  final DateTime fecha;
   final double monto;
   final double balance;
   final int duracion;
   final double cuota;
+  final String formapago;
+  final String nombre;
+  final String direccion;
+  final String cedula;
+  final String telefono;
+  final String sexo;
+  final int cobradorid;
   final int cuotasvenc;
   final double montovencido;
   final int ultimacuota;
@@ -1490,12 +1496,18 @@ class Prestamo extends DataClass implements Insertable<Prestamo> {
       {@required this.prestamoid,
       @required this.idprestamo,
       @required this.idcliente,
-      @required this.nombre,
-      @required this.direccion,
+      @required this.fecha,
       @required this.monto,
       @required this.balance,
       @required this.duracion,
       @required this.cuota,
+      @required this.formapago,
+      @required this.nombre,
+      @required this.direccion,
+      @required this.cedula,
+      @required this.telefono,
+      @required this.sexo,
+      @required this.cobradorid,
       @required this.cuotasvenc,
       @required this.montovencido,
       @required this.ultimacuota,
@@ -1508,6 +1520,7 @@ class Prestamo extends DataClass implements Insertable<Prestamo> {
     final effectivePrefix = prefix ?? '';
     final stringType = db.typeSystem.forDartType<String>();
     final intType = db.typeSystem.forDartType<int>();
+    final dateTimeType = db.typeSystem.forDartType<DateTime>();
     final doubleType = db.typeSystem.forDartType<double>();
     final boolType = db.typeSystem.forDartType<bool>();
     return Prestamo(
@@ -1517,10 +1530,8 @@ class Prestamo extends DataClass implements Insertable<Prestamo> {
           intType.mapFromDatabaseResponse(data['${effectivePrefix}idprestamo']),
       idcliente:
           intType.mapFromDatabaseResponse(data['${effectivePrefix}idcliente']),
-      nombre:
-          stringType.mapFromDatabaseResponse(data['${effectivePrefix}nombre']),
-      direccion: stringType
-          .mapFromDatabaseResponse(data['${effectivePrefix}direccion']),
+      fecha:
+          dateTimeType.mapFromDatabaseResponse(data['${effectivePrefix}fecha']),
       monto:
           doubleType.mapFromDatabaseResponse(data['${effectivePrefix}monto']),
       balance:
@@ -1529,6 +1540,19 @@ class Prestamo extends DataClass implements Insertable<Prestamo> {
           intType.mapFromDatabaseResponse(data['${effectivePrefix}duracion']),
       cuota:
           doubleType.mapFromDatabaseResponse(data['${effectivePrefix}cuota']),
+      formapago: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}formapago']),
+      nombre:
+          stringType.mapFromDatabaseResponse(data['${effectivePrefix}nombre']),
+      direccion: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}direccion']),
+      cedula:
+          stringType.mapFromDatabaseResponse(data['${effectivePrefix}cedula']),
+      telefono: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}telefono']),
+      sexo: stringType.mapFromDatabaseResponse(data['${effectivePrefix}sexo']),
+      cobradorid:
+          intType.mapFromDatabaseResponse(data['${effectivePrefix}cobradorid']),
       cuotasvenc:
           intType.mapFromDatabaseResponse(data['${effectivePrefix}cuotasvenc']),
       montovencido: doubleType
@@ -1549,12 +1573,18 @@ class Prestamo extends DataClass implements Insertable<Prestamo> {
       prestamoid: serializer.fromJson<String>(json['prestamoid']),
       idprestamo: serializer.fromJson<int>(json['idprestamo']),
       idcliente: serializer.fromJson<int>(json['idcliente']),
-      nombre: serializer.fromJson<String>(json['nombre']),
-      direccion: serializer.fromJson<String>(json['direccion']),
+      fecha: serializer.fromJson<DateTime>(json['fecha']),
       monto: serializer.fromJson<double>(json['monto']),
       balance: serializer.fromJson<double>(json['balance']),
       duracion: serializer.fromJson<int>(json['duracion']),
       cuota: serializer.fromJson<double>(json['cuota']),
+      formapago: serializer.fromJson<String>(json['formapago']),
+      nombre: serializer.fromJson<String>(json['nombre']),
+      direccion: serializer.fromJson<String>(json['direccion']),
+      cedula: serializer.fromJson<String>(json['cedula']),
+      telefono: serializer.fromJson<String>(json['telefono']),
+      sexo: serializer.fromJson<String>(json['sexo']),
+      cobradorid: serializer.fromJson<int>(json['cobradorid']),
       cuotasvenc: serializer.fromJson<int>(json['cuotasvenc']),
       montovencido: serializer.fromJson<double>(json['montovencido']),
       ultimacuota: serializer.fromJson<int>(json['ultimacuota']),
@@ -1571,12 +1601,18 @@ class Prestamo extends DataClass implements Insertable<Prestamo> {
       'prestamoid': serializer.toJson<String>(prestamoid),
       'idprestamo': serializer.toJson<int>(idprestamo),
       'idcliente': serializer.toJson<int>(idcliente),
-      'nombre': serializer.toJson<String>(nombre),
-      'direccion': serializer.toJson<String>(direccion),
+      'fecha': serializer.toJson<DateTime>(fecha),
       'monto': serializer.toJson<double>(monto),
       'balance': serializer.toJson<double>(balance),
       'duracion': serializer.toJson<int>(duracion),
       'cuota': serializer.toJson<double>(cuota),
+      'formapago': serializer.toJson<String>(formapago),
+      'nombre': serializer.toJson<String>(nombre),
+      'direccion': serializer.toJson<String>(direccion),
+      'cedula': serializer.toJson<String>(cedula),
+      'telefono': serializer.toJson<String>(telefono),
+      'sexo': serializer.toJson<String>(sexo),
+      'cobradorid': serializer.toJson<int>(cobradorid),
       'cuotasvenc': serializer.toJson<int>(cuotasvenc),
       'montovencido': serializer.toJson<double>(montovencido),
       'ultimacuota': serializer.toJson<int>(ultimacuota),
@@ -1599,11 +1635,8 @@ class Prestamo extends DataClass implements Insertable<Prestamo> {
       idcliente: idcliente == null && nullToAbsent
           ? const Value.absent()
           : Value(idcliente),
-      nombre:
-          nombre == null && nullToAbsent ? const Value.absent() : Value(nombre),
-      direccion: direccion == null && nullToAbsent
-          ? const Value.absent()
-          : Value(direccion),
+      fecha:
+          fecha == null && nullToAbsent ? const Value.absent() : Value(fecha),
       monto:
           monto == null && nullToAbsent ? const Value.absent() : Value(monto),
       balance: balance == null && nullToAbsent
@@ -1614,6 +1647,23 @@ class Prestamo extends DataClass implements Insertable<Prestamo> {
           : Value(duracion),
       cuota:
           cuota == null && nullToAbsent ? const Value.absent() : Value(cuota),
+      formapago: formapago == null && nullToAbsent
+          ? const Value.absent()
+          : Value(formapago),
+      nombre:
+          nombre == null && nullToAbsent ? const Value.absent() : Value(nombre),
+      direccion: direccion == null && nullToAbsent
+          ? const Value.absent()
+          : Value(direccion),
+      cedula:
+          cedula == null && nullToAbsent ? const Value.absent() : Value(cedula),
+      telefono: telefono == null && nullToAbsent
+          ? const Value.absent()
+          : Value(telefono),
+      sexo: sexo == null && nullToAbsent ? const Value.absent() : Value(sexo),
+      cobradorid: cobradorid == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cobradorid),
       cuotasvenc: cuotasvenc == null && nullToAbsent
           ? const Value.absent()
           : Value(cuotasvenc),
@@ -1639,12 +1689,18 @@ class Prestamo extends DataClass implements Insertable<Prestamo> {
           {String prestamoid,
           int idprestamo,
           int idcliente,
-          String nombre,
-          String direccion,
+          DateTime fecha,
           double monto,
           double balance,
           int duracion,
           double cuota,
+          String formapago,
+          String nombre,
+          String direccion,
+          String cedula,
+          String telefono,
+          String sexo,
+          int cobradorid,
           int cuotasvenc,
           double montovencido,
           int ultimacuota,
@@ -1656,12 +1712,18 @@ class Prestamo extends DataClass implements Insertable<Prestamo> {
         prestamoid: prestamoid ?? this.prestamoid,
         idprestamo: idprestamo ?? this.idprestamo,
         idcliente: idcliente ?? this.idcliente,
-        nombre: nombre ?? this.nombre,
-        direccion: direccion ?? this.direccion,
+        fecha: fecha ?? this.fecha,
         monto: monto ?? this.monto,
         balance: balance ?? this.balance,
         duracion: duracion ?? this.duracion,
         cuota: cuota ?? this.cuota,
+        formapago: formapago ?? this.formapago,
+        nombre: nombre ?? this.nombre,
+        direccion: direccion ?? this.direccion,
+        cedula: cedula ?? this.cedula,
+        telefono: telefono ?? this.telefono,
+        sexo: sexo ?? this.sexo,
+        cobradorid: cobradorid ?? this.cobradorid,
         cuotasvenc: cuotasvenc ?? this.cuotasvenc,
         montovencido: montovencido ?? this.montovencido,
         ultimacuota: ultimacuota ?? this.ultimacuota,
@@ -1676,12 +1738,18 @@ class Prestamo extends DataClass implements Insertable<Prestamo> {
           ..write('prestamoid: $prestamoid, ')
           ..write('idprestamo: $idprestamo, ')
           ..write('idcliente: $idcliente, ')
-          ..write('nombre: $nombre, ')
-          ..write('direccion: $direccion, ')
+          ..write('fecha: $fecha, ')
           ..write('monto: $monto, ')
           ..write('balance: $balance, ')
           ..write('duracion: $duracion, ')
           ..write('cuota: $cuota, ')
+          ..write('formapago: $formapago, ')
+          ..write('nombre: $nombre, ')
+          ..write('direccion: $direccion, ')
+          ..write('cedula: $cedula, ')
+          ..write('telefono: $telefono, ')
+          ..write('sexo: $sexo, ')
+          ..write('cobradorid: $cobradorid, ')
           ..write('cuotasvenc: $cuotasvenc, ')
           ..write('montovencido: $montovencido, ')
           ..write('ultimacuota: $ultimacuota, ')
@@ -1710,18 +1778,22 @@ class Prestamo extends DataClass implements Insertable<Prestamo> {
                                                       $mrjc(
                                                           $mrjc(
                                                               $mrjc(
-                                                                  0,
-                                                                  prestamoid
-                                                                      .hashCode),
-                                                              idprestamo
-                                                                  .hashCode),
-                                                          idcliente.hashCode),
+                                                                  $mrjc(
+                                                                      $mrjc(
+                                                                          $mrjc(
+                                                                              $mrjc($mrjc($mrjc(0, prestamoid.hashCode), idprestamo.hashCode), idcliente.hashCode),
+                                                                              fecha.hashCode),
+                                                                          monto.hashCode),
+                                                                      balance.hashCode),
+                                                                  duracion.hashCode),
+                                                              cuota.hashCode),
+                                                          formapago.hashCode),
                                                       nombre.hashCode),
                                                   direccion.hashCode),
-                                              monto.hashCode),
-                                          balance.hashCode),
-                                      duracion.hashCode),
-                                  cuota.hashCode),
+                                              cedula.hashCode),
+                                          telefono.hashCode),
+                                      sexo.hashCode),
+                                  cobradorid.hashCode),
                               cuotasvenc.hashCode),
                           montovencido.hashCode),
                       ultimacuota.hashCode),
@@ -1736,12 +1808,18 @@ class Prestamo extends DataClass implements Insertable<Prestamo> {
           other.prestamoid == prestamoid &&
           other.idprestamo == idprestamo &&
           other.idcliente == idcliente &&
-          other.nombre == nombre &&
-          other.direccion == direccion &&
+          other.fecha == fecha &&
           other.monto == monto &&
           other.balance == balance &&
           other.duracion == duracion &&
           other.cuota == cuota &&
+          other.formapago == formapago &&
+          other.nombre == nombre &&
+          other.direccion == direccion &&
+          other.cedula == cedula &&
+          other.telefono == telefono &&
+          other.sexo == sexo &&
+          other.cobradorid == cobradorid &&
           other.cuotasvenc == cuotasvenc &&
           other.montovencido == montovencido &&
           other.ultimacuota == ultimacuota &&
@@ -1755,12 +1833,18 @@ class PrestamosCompanion extends UpdateCompanion<Prestamo> {
   final Value<String> prestamoid;
   final Value<int> idprestamo;
   final Value<int> idcliente;
-  final Value<String> nombre;
-  final Value<String> direccion;
+  final Value<DateTime> fecha;
   final Value<double> monto;
   final Value<double> balance;
   final Value<int> duracion;
   final Value<double> cuota;
+  final Value<String> formapago;
+  final Value<String> nombre;
+  final Value<String> direccion;
+  final Value<String> cedula;
+  final Value<String> telefono;
+  final Value<String> sexo;
+  final Value<int> cobradorid;
   final Value<int> cuotasvenc;
   final Value<double> montovencido;
   final Value<int> ultimacuota;
@@ -1772,12 +1856,18 @@ class PrestamosCompanion extends UpdateCompanion<Prestamo> {
     this.prestamoid = const Value.absent(),
     this.idprestamo = const Value.absent(),
     this.idcliente = const Value.absent(),
-    this.nombre = const Value.absent(),
-    this.direccion = const Value.absent(),
+    this.fecha = const Value.absent(),
     this.monto = const Value.absent(),
     this.balance = const Value.absent(),
     this.duracion = const Value.absent(),
     this.cuota = const Value.absent(),
+    this.formapago = const Value.absent(),
+    this.nombre = const Value.absent(),
+    this.direccion = const Value.absent(),
+    this.cedula = const Value.absent(),
+    this.telefono = const Value.absent(),
+    this.sexo = const Value.absent(),
+    this.cobradorid = const Value.absent(),
     this.cuotasvenc = const Value.absent(),
     this.montovencido = const Value.absent(),
     this.ultimacuota = const Value.absent(),
@@ -1826,21 +1916,16 @@ class $PrestamosTable extends Prestamos
     );
   }
 
-  final VerificationMeta _nombreMeta = const VerificationMeta('nombre');
-  GeneratedTextColumn _nombre;
+  final VerificationMeta _fechaMeta = const VerificationMeta('fecha');
+  GeneratedDateTimeColumn _fecha;
   @override
-  GeneratedTextColumn get nombre => _nombre ??= _constructNombre();
-  GeneratedTextColumn _constructNombre() {
-    return GeneratedTextColumn('nombre', $tableName, false, maxTextLength: 100);
-  }
-
-  final VerificationMeta _direccionMeta = const VerificationMeta('direccion');
-  GeneratedTextColumn _direccion;
-  @override
-  GeneratedTextColumn get direccion => _direccion ??= _constructDireccion();
-  GeneratedTextColumn _constructDireccion() {
-    return GeneratedTextColumn('direccion', $tableName, false,
-        maxTextLength: 300);
+  GeneratedDateTimeColumn get fecha => _fecha ??= _constructFecha();
+  GeneratedDateTimeColumn _constructFecha() {
+    return GeneratedDateTimeColumn(
+      'fecha',
+      $tableName,
+      false,
+    );
   }
 
   final VerificationMeta _montoMeta = const VerificationMeta('monto');
@@ -1886,6 +1971,69 @@ class $PrestamosTable extends Prestamos
   GeneratedRealColumn _constructCuota() {
     return GeneratedRealColumn(
       'cuota',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _formapagoMeta = const VerificationMeta('formapago');
+  GeneratedTextColumn _formapago;
+  @override
+  GeneratedTextColumn get formapago => _formapago ??= _constructFormapago();
+  GeneratedTextColumn _constructFormapago() {
+    return GeneratedTextColumn('formapago', $tableName, false,
+        maxTextLength: 30);
+  }
+
+  final VerificationMeta _nombreMeta = const VerificationMeta('nombre');
+  GeneratedTextColumn _nombre;
+  @override
+  GeneratedTextColumn get nombre => _nombre ??= _constructNombre();
+  GeneratedTextColumn _constructNombre() {
+    return GeneratedTextColumn('nombre', $tableName, false, maxTextLength: 300);
+  }
+
+  final VerificationMeta _direccionMeta = const VerificationMeta('direccion');
+  GeneratedTextColumn _direccion;
+  @override
+  GeneratedTextColumn get direccion => _direccion ??= _constructDireccion();
+  GeneratedTextColumn _constructDireccion() {
+    return GeneratedTextColumn('direccion', $tableName, false,
+        maxTextLength: 600);
+  }
+
+  final VerificationMeta _cedulaMeta = const VerificationMeta('cedula');
+  GeneratedTextColumn _cedula;
+  @override
+  GeneratedTextColumn get cedula => _cedula ??= _constructCedula();
+  GeneratedTextColumn _constructCedula() {
+    return GeneratedTextColumn('cedula', $tableName, false, maxTextLength: 20);
+  }
+
+  final VerificationMeta _telefonoMeta = const VerificationMeta('telefono');
+  GeneratedTextColumn _telefono;
+  @override
+  GeneratedTextColumn get telefono => _telefono ??= _constructTelefono();
+  GeneratedTextColumn _constructTelefono() {
+    return GeneratedTextColumn('telefono', $tableName, false,
+        maxTextLength: 30);
+  }
+
+  final VerificationMeta _sexoMeta = const VerificationMeta('sexo');
+  GeneratedTextColumn _sexo;
+  @override
+  GeneratedTextColumn get sexo => _sexo ??= _constructSexo();
+  GeneratedTextColumn _constructSexo() {
+    return GeneratedTextColumn('sexo', $tableName, false, maxTextLength: 30);
+  }
+
+  final VerificationMeta _cobradoridMeta = const VerificationMeta('cobradorid');
+  GeneratedIntColumn _cobradorid;
+  @override
+  GeneratedIntColumn get cobradorid => _cobradorid ??= _constructCobradorid();
+  GeneratedIntColumn _constructCobradorid() {
+    return GeneratedIntColumn(
+      'cobradorid',
       $tableName,
       false,
     );
@@ -1986,12 +2134,18 @@ class $PrestamosTable extends Prestamos
         prestamoid,
         idprestamo,
         idcliente,
-        nombre,
-        direccion,
+        fecha,
         monto,
         balance,
         duracion,
         cuota,
+        formapago,
+        nombre,
+        direccion,
+        cedula,
+        telefono,
+        sexo,
+        cobradorid,
         cuotasvenc,
         montovencido,
         ultimacuota,
@@ -2028,17 +2182,11 @@ class $PrestamosTable extends Prestamos
     } else if (idcliente.isRequired && isInserting) {
       context.missing(_idclienteMeta);
     }
-    if (d.nombre.present) {
+    if (d.fecha.present) {
       context.handle(
-          _nombreMeta, nombre.isAcceptableValue(d.nombre.value, _nombreMeta));
-    } else if (nombre.isRequired && isInserting) {
-      context.missing(_nombreMeta);
-    }
-    if (d.direccion.present) {
-      context.handle(_direccionMeta,
-          direccion.isAcceptableValue(d.direccion.value, _direccionMeta));
-    } else if (direccion.isRequired && isInserting) {
-      context.missing(_direccionMeta);
+          _fechaMeta, fecha.isAcceptableValue(d.fecha.value, _fechaMeta));
+    } else if (fecha.isRequired && isInserting) {
+      context.missing(_fechaMeta);
     }
     if (d.monto.present) {
       context.handle(
@@ -2063,6 +2211,48 @@ class $PrestamosTable extends Prestamos
           _cuotaMeta, cuota.isAcceptableValue(d.cuota.value, _cuotaMeta));
     } else if (cuota.isRequired && isInserting) {
       context.missing(_cuotaMeta);
+    }
+    if (d.formapago.present) {
+      context.handle(_formapagoMeta,
+          formapago.isAcceptableValue(d.formapago.value, _formapagoMeta));
+    } else if (formapago.isRequired && isInserting) {
+      context.missing(_formapagoMeta);
+    }
+    if (d.nombre.present) {
+      context.handle(
+          _nombreMeta, nombre.isAcceptableValue(d.nombre.value, _nombreMeta));
+    } else if (nombre.isRequired && isInserting) {
+      context.missing(_nombreMeta);
+    }
+    if (d.direccion.present) {
+      context.handle(_direccionMeta,
+          direccion.isAcceptableValue(d.direccion.value, _direccionMeta));
+    } else if (direccion.isRequired && isInserting) {
+      context.missing(_direccionMeta);
+    }
+    if (d.cedula.present) {
+      context.handle(
+          _cedulaMeta, cedula.isAcceptableValue(d.cedula.value, _cedulaMeta));
+    } else if (cedula.isRequired && isInserting) {
+      context.missing(_cedulaMeta);
+    }
+    if (d.telefono.present) {
+      context.handle(_telefonoMeta,
+          telefono.isAcceptableValue(d.telefono.value, _telefonoMeta));
+    } else if (telefono.isRequired && isInserting) {
+      context.missing(_telefonoMeta);
+    }
+    if (d.sexo.present) {
+      context.handle(
+          _sexoMeta, sexo.isAcceptableValue(d.sexo.value, _sexoMeta));
+    } else if (sexo.isRequired && isInserting) {
+      context.missing(_sexoMeta);
+    }
+    if (d.cobradorid.present) {
+      context.handle(_cobradoridMeta,
+          cobradorid.isAcceptableValue(d.cobradorid.value, _cobradoridMeta));
+    } else if (cobradorid.isRequired && isInserting) {
+      context.missing(_cobradoridMeta);
     }
     if (d.cuotasvenc.present) {
       context.handle(_cuotasvencMeta,
@@ -2133,11 +2323,8 @@ class $PrestamosTable extends Prestamos
     if (d.idcliente.present) {
       map['idcliente'] = Variable<int, IntType>(d.idcliente.value);
     }
-    if (d.nombre.present) {
-      map['nombre'] = Variable<String, StringType>(d.nombre.value);
-    }
-    if (d.direccion.present) {
-      map['direccion'] = Variable<String, StringType>(d.direccion.value);
+    if (d.fecha.present) {
+      map['fecha'] = Variable<DateTime, DateTimeType>(d.fecha.value);
     }
     if (d.monto.present) {
       map['monto'] = Variable<double, RealType>(d.monto.value);
@@ -2150,6 +2337,27 @@ class $PrestamosTable extends Prestamos
     }
     if (d.cuota.present) {
       map['cuota'] = Variable<double, RealType>(d.cuota.value);
+    }
+    if (d.formapago.present) {
+      map['formapago'] = Variable<String, StringType>(d.formapago.value);
+    }
+    if (d.nombre.present) {
+      map['nombre'] = Variable<String, StringType>(d.nombre.value);
+    }
+    if (d.direccion.present) {
+      map['direccion'] = Variable<String, StringType>(d.direccion.value);
+    }
+    if (d.cedula.present) {
+      map['cedula'] = Variable<String, StringType>(d.cedula.value);
+    }
+    if (d.telefono.present) {
+      map['telefono'] = Variable<String, StringType>(d.telefono.value);
+    }
+    if (d.sexo.present) {
+      map['sexo'] = Variable<String, StringType>(d.sexo.value);
+    }
+    if (d.cobradorid.present) {
+      map['cobradorid'] = Variable<int, IntType>(d.cobradorid.value);
     }
     if (d.cuotasvenc.present) {
       map['cuotasvenc'] = Variable<int, IntType>(d.cuotasvenc.value);
@@ -2185,6 +2393,7 @@ class Recibo extends DataClass implements Insertable<Recibo> {
   final String serial;
   final String documento;
   final String prestamoid;
+  final int idcliente;
   final DateTime fecha;
   final int idcobrador;
   final double monto;
@@ -2201,6 +2410,7 @@ class Recibo extends DataClass implements Insertable<Recibo> {
       {@required this.serial,
       @required this.documento,
       @required this.prestamoid,
+      @required this.idcliente,
       @required this.fecha,
       @required this.idcobrador,
       @required this.monto,
@@ -2217,8 +2427,8 @@ class Recibo extends DataClass implements Insertable<Recibo> {
       {String prefix}) {
     final effectivePrefix = prefix ?? '';
     final stringType = db.typeSystem.forDartType<String>();
-    final dateTimeType = db.typeSystem.forDartType<DateTime>();
     final intType = db.typeSystem.forDartType<int>();
+    final dateTimeType = db.typeSystem.forDartType<DateTime>();
     final doubleType = db.typeSystem.forDartType<double>();
     final boolType = db.typeSystem.forDartType<bool>();
     return Recibo(
@@ -2228,6 +2438,8 @@ class Recibo extends DataClass implements Insertable<Recibo> {
           .mapFromDatabaseResponse(data['${effectivePrefix}documento']),
       prestamoid: stringType
           .mapFromDatabaseResponse(data['${effectivePrefix}prestamoid']),
+      idcliente:
+          intType.mapFromDatabaseResponse(data['${effectivePrefix}idcliente']),
       fecha:
           dateTimeType.mapFromDatabaseResponse(data['${effectivePrefix}fecha']),
       idcobrador:
@@ -2258,6 +2470,7 @@ class Recibo extends DataClass implements Insertable<Recibo> {
       serial: serializer.fromJson<String>(json['serial']),
       documento: serializer.fromJson<String>(json['documento']),
       prestamoid: serializer.fromJson<String>(json['prestamoid']),
+      idcliente: serializer.fromJson<int>(json['idcliente']),
       fecha: serializer.fromJson<DateTime>(json['fecha']),
       idcobrador: serializer.fromJson<int>(json['idcobrador']),
       monto: serializer.fromJson<double>(json['monto']),
@@ -2279,6 +2492,7 @@ class Recibo extends DataClass implements Insertable<Recibo> {
       'serial': serializer.toJson<String>(serial),
       'documento': serializer.toJson<String>(documento),
       'prestamoid': serializer.toJson<String>(prestamoid),
+      'idcliente': serializer.toJson<int>(idcliente),
       'fecha': serializer.toJson<DateTime>(fecha),
       'idcobrador': serializer.toJson<int>(idcobrador),
       'monto': serializer.toJson<double>(monto),
@@ -2305,6 +2519,9 @@ class Recibo extends DataClass implements Insertable<Recibo> {
       prestamoid: prestamoid == null && nullToAbsent
           ? const Value.absent()
           : Value(prestamoid),
+      idcliente: idcliente == null && nullToAbsent
+          ? const Value.absent()
+          : Value(idcliente),
       fecha:
           fecha == null && nullToAbsent ? const Value.absent() : Value(fecha),
       idcobrador: idcobrador == null && nullToAbsent
@@ -2343,6 +2560,7 @@ class Recibo extends DataClass implements Insertable<Recibo> {
           {String serial,
           String documento,
           String prestamoid,
+          int idcliente,
           DateTime fecha,
           int idcobrador,
           double monto,
@@ -2359,6 +2577,7 @@ class Recibo extends DataClass implements Insertable<Recibo> {
         serial: serial ?? this.serial,
         documento: documento ?? this.documento,
         prestamoid: prestamoid ?? this.prestamoid,
+        idcliente: idcliente ?? this.idcliente,
         fecha: fecha ?? this.fecha,
         idcobrador: idcobrador ?? this.idcobrador,
         monto: monto ?? this.monto,
@@ -2378,6 +2597,7 @@ class Recibo extends DataClass implements Insertable<Recibo> {
           ..write('serial: $serial, ')
           ..write('documento: $documento, ')
           ..write('prestamoid: $prestamoid, ')
+          ..write('idcliente: $idcliente, ')
           ..write('fecha: $fecha, ')
           ..write('idcobrador: $idcobrador, ')
           ..write('monto: $monto, ')
@@ -2409,10 +2629,15 @@ class Recibo extends DataClass implements Insertable<Recibo> {
                                               $mrjc(
                                                   $mrjc(
                                                       $mrjc(
-                                                          $mrjc(0,
-                                                              serial.hashCode),
-                                                          documento.hashCode),
-                                                      prestamoid.hashCode),
+                                                          $mrjc(
+                                                              $mrjc(
+                                                                  0,
+                                                                  serial
+                                                                      .hashCode),
+                                                              documento
+                                                                  .hashCode),
+                                                          prestamoid.hashCode),
+                                                      idcliente.hashCode),
                                                   fecha.hashCode),
                                               idcobrador.hashCode),
                                           monto.hashCode),
@@ -2432,6 +2657,7 @@ class Recibo extends DataClass implements Insertable<Recibo> {
           other.serial == serial &&
           other.documento == documento &&
           other.prestamoid == prestamoid &&
+          other.idcliente == idcliente &&
           other.fecha == fecha &&
           other.idcobrador == idcobrador &&
           other.monto == monto &&
@@ -2450,6 +2676,7 @@ class RecibosCompanion extends UpdateCompanion<Recibo> {
   final Value<String> serial;
   final Value<String> documento;
   final Value<String> prestamoid;
+  final Value<int> idcliente;
   final Value<DateTime> fecha;
   final Value<int> idcobrador;
   final Value<double> monto;
@@ -2466,6 +2693,7 @@ class RecibosCompanion extends UpdateCompanion<Recibo> {
     this.serial = const Value.absent(),
     this.documento = const Value.absent(),
     this.prestamoid = const Value.absent(),
+    this.idcliente = const Value.absent(),
     this.fecha = const Value.absent(),
     this.idcobrador = const Value.absent(),
     this.monto = const Value.absent(),
@@ -2509,6 +2737,18 @@ class $RecibosTable extends Recibos with TableInfo<$RecibosTable, Recibo> {
   GeneratedTextColumn _constructPrestamoid() {
     return GeneratedTextColumn('prestamoid', $tableName, false,
         maxTextLength: 15);
+  }
+
+  final VerificationMeta _idclienteMeta = const VerificationMeta('idcliente');
+  GeneratedIntColumn _idcliente;
+  @override
+  GeneratedIntColumn get idcliente => _idcliente ??= _constructIdcliente();
+  GeneratedIntColumn _constructIdcliente() {
+    return GeneratedIntColumn(
+      'idcliente',
+      $tableName,
+      false,
+    );
   }
 
   final VerificationMeta _fechaMeta = const VerificationMeta('fecha');
@@ -2655,6 +2895,7 @@ class $RecibosTable extends Recibos with TableInfo<$RecibosTable, Recibo> {
         serial,
         documento,
         prestamoid,
+        idcliente,
         fecha,
         idcobrador,
         monto,
@@ -2695,6 +2936,12 @@ class $RecibosTable extends Recibos with TableInfo<$RecibosTable, Recibo> {
           prestamoid.isAcceptableValue(d.prestamoid.value, _prestamoidMeta));
     } else if (prestamoid.isRequired && isInserting) {
       context.missing(_prestamoidMeta);
+    }
+    if (d.idcliente.present) {
+      context.handle(_idclienteMeta,
+          idcliente.isAcceptableValue(d.idcliente.value, _idclienteMeta));
+    } else if (idcliente.isRequired && isInserting) {
+      context.missing(_idclienteMeta);
     }
     if (d.fecha.present) {
       context.handle(
@@ -2794,6 +3041,9 @@ class $RecibosTable extends Recibos with TableInfo<$RecibosTable, Recibo> {
     }
     if (d.prestamoid.present) {
       map['prestamoid'] = Variable<String, StringType>(d.prestamoid.value);
+    }
+    if (d.idcliente.present) {
+      map['idcliente'] = Variable<int, IntType>(d.idcliente.value);
     }
     if (d.fecha.present) {
       map['fecha'] = Variable<DateTime, DateTimeType>(d.fecha.value);

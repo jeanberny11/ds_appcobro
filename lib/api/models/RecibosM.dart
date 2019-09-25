@@ -11,6 +11,7 @@ class RecibosM {
   String _concepto;
   bool _efectivo;
   String _requesttag;
+  bool _ladob;
 
   RecibosM(
       {@required String serial,
@@ -22,7 +23,8 @@ class RecibosM {
       @required String telcob,
       @required String concepto,
       @required bool efectivo,
-      @required requesttag}) {
+      @required requesttag,
+      @required bool ladob}) {
     _serial = serial;
     _documento = documento;
     _prestamoid = prestamoid;
@@ -33,6 +35,7 @@ class RecibosM {
     _concepto = concepto;
     _efectivo = efectivo;
     _requesttag = requesttag;
+    _ladob = ladob;
   }
 
   Map<String, dynamic> toJson() {
@@ -42,11 +45,12 @@ class RecibosM {
       'prestamoid': _prestamoid,
       'monto': _monto,
       'fecha': _fecha,
-      'idcliente': _idcliente,      
+      'idcliente': _idcliente,
       'telcob': _telcob,
       'concepto': _concepto,
       'efectivo': _efectivo,
-      'requesttag': _requesttag
+      'requesttag': _requesttag,
+      'ladob': _ladob
     };
   }
 }

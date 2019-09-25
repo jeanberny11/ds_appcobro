@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:ds_appcobro/api/ApiClient.dart';
 import 'package:ds_appcobro/api/ErrorResponse.dart';
 import 'package:ds_appcobro/api/exception/DsException.dart';

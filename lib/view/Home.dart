@@ -10,6 +10,7 @@ import 'package:ds_appcobro/database/dao/SettingDao.dart';
 import 'package:ds_appcobro/database/dao/SystemSettingDao.dart';
 import 'package:ds_appcobro/utils/PagesRoute.dart';
 import 'package:ds_appcobro/utils/StringResources.dart';
+import 'package:ds_appcobro/view/CobroValidate.dart';
 import 'package:ds_appcobro/widgets/Loader.dart';
 import 'package:ds_appcobro/widgets/flutter_radial_menu.dart';
 import 'package:flutter/material.dart';
@@ -91,7 +92,7 @@ class _HomeState extends State<Home> {
                   }
                 case 3:
                   {
-                    Navigator.of(context).pushNamed(PageRoutes.outrecibos);
+                    Navigator.of(context).pushNamed(PageRoutes.cobroprovider,arguments: SearchMode.all);
                     break;
                   }
                 case 4:
@@ -240,133 +241,144 @@ class _HomeState extends State<Home> {
               elevation: 8,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5)),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Center(
-                        child: Text(
-                      "Prestamos",
-                      style: TextStyle(
-                          color: Theme.of(context).accentColor,
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold),
-                    )),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: Text(
-                            "Total Prestamos: ",
-                            style: TextStyle(
-                                color: Theme.of(context).accentColor,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        Expanded(
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: FutureBuilder<int>(
-                              future: Provider.of<PrestamosDao>(context)
-                                  .getTotalPrestamos(),
-                              builder: (context, snp) {
-                                if (snp.connectionState ==
-                                    ConnectionState.done) {
-                                  return Text(snp.data.toString());
-                                } else {
-                                  return Loader(
-                                    initialradius: 10,
-                                    animationduration: 3,
-                                    width: 20,
-                                    height: 20,
-                                  );
-                                }
-                              },
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: Text(
-                            "Prestamos atrasados: ",
-                            style: TextStyle(
-                                color: Theme.of(context).accentColor,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        Expanded(
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: FutureBuilder<int>(
-                              future: Provider.of<PrestamosDao>(context)
-                                  .getTotalPrestamosAtrasados(),
-                              builder: (context, snp) {
-                                if (snp.connectionState ==
-                                    ConnectionState.done) {
-                                  return Text(snp.data.toString());
-                                } else {
-                                  return Loader(
-                                    initialradius: 10,
-                                    animationduration: 3,
-                                    width: 20,
-                                    height: 20,
-                                  );
-                                }
-                              },
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: Text(
-                            "Prestamos Cobrados: ",
-                            style: TextStyle(
-                                color: Theme.of(context).accentColor,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        Expanded(
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: FutureBuilder<int>(
-                              future: Provider.of<PrestamosDao>(context)
-                                  .getTotalPrestamosCobrados(),
-                              builder: (context, snp) {
-                                if (snp.connectionState ==
-                                    ConnectionState.done) {
-                                  return Text(snp.data.toString());
-                                } else {
-                                  return Loader(
-                                    initialradius: 10,
-                                    animationduration: 3,
-                                    width: 20,
-                                    height: 20,
-                                  );
-                                }
-                              },
-                            ),
-                          ),
-                        )
-                      ],
-                    )
-                  ],
-                ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    "Total Prestamos",
+                    style: TextStyle(
+                        color: Theme.of(context).accentColor,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  FutureBuilder<int>(
+                    future: Provider.of<PrestamosDao>(context).getTotalPrestamos(),
+                    builder: (context, snp) {
+                      if (snp.connectionState == ConnectionState.done) {
+                        if (snp.data != null) {
+                          return Text(snp.data.toString());
+                        } else {
+                          return Text("0");
+                        }
+                      } else {
+                        return Loader(
+                          initialradius: 10,
+                          animationduration: 3,
+                          width: 20,
+                          height: 20,
+                        );
+                      }
+                    },
+                  )
+                ],
+              ),
+            ),
+            Card(
+              elevation: 8,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5)),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    "Prestamos Atrasados",
+                    style: TextStyle(
+                        color: Theme.of(context).accentColor,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  FutureBuilder<int>(
+                    future: Provider.of<PrestamosDao>(context).getTotalPrestamosAtrasados(),
+                    builder: (context, snp) {
+                      if (snp.connectionState == ConnectionState.done) {
+                        if (snp.data != null) {
+                          return Text(snp.data.toString());
+                        } else {
+                          return Text("0");
+                        }
+                      } else {
+                        return Loader(
+                          initialradius: 10,
+                          animationduration: 3,
+                          width: 20,
+                          height: 20,
+                        );
+                      }
+                    },
+                  )
+                ],
+              ),
+            ),
+            Card(
+              elevation: 8,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5)),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    "Prestamos con venc. hoy",textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: Theme.of(context).accentColor,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  FutureBuilder<int>(
+                    future: Provider.of<PrestamosDao>(context).getTotalPrestamosVencHoy(),
+                    builder: (context, snp) {
+                      if (snp.connectionState == ConnectionState.done) {
+                        if (snp.data != null) {
+                          return Text(snp.data.toString());
+                        } else {
+                          return Text("0");
+                        }
+                      } else {
+                        return Loader(
+                          initialradius: 10,
+                          animationduration: 3,
+                          width: 20,
+                          height: 20,
+                        );
+                      }
+                    },
+                  )
+                ],
+              ),
+            ),
+            Card(
+              elevation: 8,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5)),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    "Prestamos cobrados",textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: Theme.of(context).accentColor,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  FutureBuilder<int>(
+                    future: Provider.of<PrestamosDao>(context).getTotalPrestamosCobrados(),
+                    builder: (context, snp) {
+                      if (snp.connectionState == ConnectionState.done) {
+                        if (snp.data != null) {
+                          return Text(snp.data.toString());
+                        } else {
+                          return Text("0");
+                        }
+                      } else {
+                        return Loader(
+                          initialradius: 10,
+                          animationduration: 3,
+                          width: 20,
+                          height: 20,
+                        );
+                      }
+                    },
+                  )
+                ],
               ),
             ),
             Card(
@@ -460,9 +472,12 @@ class _HomeState extends State<Home> {
           staggeredTiles: [
             StaggeredTile.count(1, 0.5),
             StaggeredTile.count(1, 0.5),
-            StaggeredTile.count(2, 1),
-            StaggeredTile.count(2, 0.3),
-            StaggeredTile.count(2, 0.3)
+            StaggeredTile.count(1, 0.5),
+            StaggeredTile.count(1, 0.5),
+            StaggeredTile.count(1, 0.5),            
+            StaggeredTile.count(1, 0.5),
+            StaggeredTile.count(1, 0.5),
+            StaggeredTile.count(1, 0.5)
           ],
         ),
       ),

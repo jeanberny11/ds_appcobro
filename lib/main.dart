@@ -17,6 +17,8 @@ import 'package:ds_appcobro/database/dao/SystemSettingDao.dart';
 import 'package:ds_appcobro/database/dao/UsuarioDao.dart';
 import 'package:ds_appcobro/database/dao/UsuarioLevelDao.dart';
 import 'package:ds_appcobro/managers/CargarDatosManager.dart';
+import 'package:ds_appcobro/managers/PrinterManager.dart';
+import 'package:ds_appcobro/managers/ReciboManager.dart';
 import 'package:ds_appcobro/utils/PagesRoute.dart';
 import 'package:ds_appcobro/utils/StringResources.dart';
 import 'package:ds_appcobro/utils/StringResourcesDelegate.dart';
@@ -29,6 +31,7 @@ import 'package:ds_appcobro/view/InSecuencias.dart';
 import 'package:ds_appcobro/view/InUsuario.dart';
 import 'package:ds_appcobro/view/Login.dart';
 import 'package:ds_appcobro/view/OutCobradores.dart';
+import 'package:ds_appcobro/view/OutRecibosView.dart';
 import 'package:ds_appcobro/view/OutSecuencias.dart';
 import 'package:ds_appcobro/view/OutUsuarios.dart';
 import 'package:ds_appcobro/view/PasswordEdit.dart';
@@ -137,6 +140,16 @@ class MyApp extends StatelessWidget {
           builder: (context) {
             return BluetoothManager();
           },
+        ),
+        ProxyProvider4<RecibosServices,RecibosDao,PrestamosDao,SecuenciasDao,ReciboManager>(
+          builder: (context,recibosservices,recibosdao,prestamosdao,secuenciasdao,_){
+            return ReciboManager(recibosservices, recibosdao,prestamosdao,secuenciasdao);
+          },
+        ),
+        ProxyProvider2<PrestamosDao,RecibosDao,PrinterManager>(
+          builder: (context,prestamosdao,recibosdao,_){
+            return PrinterManager(prestamosdao,recibosdao);
+          },
         )
       ],
       child: MaterialApp(
@@ -244,7 +257,7 @@ class MyApp extends StatelessWidget {
                             child: CargarDatosView(),
                           ));
                 }
-              case PageRoutes.outrecibos:
+              case PageRoutes.cobroprovider:
                 {
                   return MaterialPageRoute(
                       builder: (context) => CobroValidate(
@@ -253,8 +266,14 @@ class MyApp extends StatelessWidget {
                             cobradorDao: Provider.of<CobradorDao>(context),
                             prestamosDao: Provider.of<PrestamosDao>(context),
                             systemSettingDao: Provider.of<SystemSettingDao>(context),
+                            searchMode: setting.arguments,
                           ));
                 }
+              case PageRoutes.outallpresrecibos:
+                {
+                  return MaterialPageRoute(
+                      builder: (context) => OutRecibosView());
+                }  
               case PageRoutes.cobro:
                 {
                   return MaterialPageRoute(

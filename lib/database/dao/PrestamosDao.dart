@@ -17,8 +17,18 @@ class PrestamosDao extends DatabaseAccessor<AppDatabase>
     return res.length;
   }
 
-  Future<Prestamo> getPrestamo(String prestamoid)async{
-    var result=await (select(prestamos)..where((p)=>p.prestamoid.equals(prestamoid))).get();
+  Future<Prestamo> getPrestamo(String prestamoid) async {
+    var result = await (select(prestamos)
+          ..where((p) => p.prestamoid.equals(prestamoid)))
+        .get();
+    if (result.length > 0) {
+      return result.first;
+    }
+    return null;
+  }
+
+  Future<Prestamo> getPrestamoDto(String serial)async{
+    var result=await (select(prestamos)..where((p)=>p.cobrado.equals(false))).get();
     if(result.length>0){
       return result.first;
     }
@@ -47,31 +57,24 @@ class PrestamosDao extends DatabaseAccessor<AppDatabase>
   Future<int> deleteAllPrestamos() => delete(prestamos).go();
   Future<int> deleteAllPagares() => delete(pagares).go();
 
-  Stream<List<Prestamo>> watchAllPrestamosNoCobrados() => (select(prestamos)
-        ..where((p) => p.cobrado.equals(false))
-        ..orderBy([(p) => OrderingTerm(expression: p.nombre)]))
-      .watch();
-
-  Future<List<Prestamo>> getAllPrestamosNoCobrados() => (select(prestamos)
-        ..where((p) => p.cobrado.equals(false))
-        ..orderBy([(p) => OrderingTerm(expression: p.nombre)]))
-      .get();
+  Future<List<Prestamo>> getPrestamosNoCobrados()=>(select(prestamos)..where((p)=>p.cobrado.equals(false))).get();
 
   Future<int> getTotalPrestamosVencHoy() async {
     var datetime = DateTime.now();
-    var hoy = DateTime.utc(datetime.year, datetime.month, datetime.day);
-    var result =
-        await (select(pagares)..where((p) => p.fechavenc.equals(hoy))).get();
-    var newres = groupBy(result, (r) => r.prestamoid);
-    return newres.length;
+    var hoy = DateTime(datetime.year, datetime.month, datetime.day);
+    var res=await (select(pagares)..where((p)=>p.fechavenc.equals(hoy))).get();
+    var group=groupBy(res,(pag)=>pag.prestamoid);
+    return group.length;
   }
 
-  Future<List<Pagare>> getPrestamoPagares(String prestamoid) => (select(pagares)
+  Future<List<Pagare>> getPrestamoPagaresConBalance(String prestamoid) => (select(pagares)
         ..where((p) => p.prestamoid.equals(prestamoid))
+        ..where((p)=> p.balance.isBiggerThanValue(0))
         ..orderBy([(p) => OrderingTerm(expression: p.pagare)]))
       .get();
 
-  Future<int>  setPrestamoCobrado(String prestamoid){
-    return customUpdate("update prestamos set cobrado=1 where prestamoid='$prestamoid'");
+  Future<int> setPrestamoCobrado(String prestamoid) {
+    return customUpdate(
+        "update prestamos set cobrado=1 where prestamoid='$prestamoid'");
   }
 }

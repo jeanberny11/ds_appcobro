@@ -41,8 +41,8 @@ class _RecibosNoSincViewState extends State<RecibosNoSincView> {
       setState(() {
         _mensaje = "Enviando recibo ${recibo.documento}";
       });
-      var prestamo =
-          await Provider.of<PrestamosDao>(context).getPrestamo(recibo.prestamoid);
+      var prestamo = await Provider.of<PrestamosDao>(context)
+          .getPrestamo(recibo.prestamoid);
       var recibom = RecibosM(
           serial: recibo.serial,
           documento: recibo.documento,
@@ -54,7 +54,8 @@ class _RecibosNoSincViewState extends State<RecibosNoSincView> {
           requesttag:
               this.runtimeType.toString() + DateTime.now().toIso8601String(),
           idcliente: prestamo.idcliente,
-          telcob: System().currentcobrador.telefono);
+          telcob: System().currentcobrador.telefono,
+          ladob: recibo.ladob);
       try {
         var reciboresult = await services.enviarRecibo(recibom);
         if (!reciboresult.insertado) {

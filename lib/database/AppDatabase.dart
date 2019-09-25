@@ -62,7 +62,7 @@ class AppDatabase extends _$AppDatabase {
           orReplace: true);
     }
   }
-
+  
   List<MenuOption> defaultMenus() {
     return [
       MenuOption(

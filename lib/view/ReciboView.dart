@@ -1,15 +1,10 @@
 import 'dart:io';
 
 import 'package:ds_appcobro/System.dart';
-import 'package:ds_appcobro/api/models/ImpresionReciboData.dart';
-import 'package:ds_appcobro/api/models/RecibosM.dart';
-import 'package:ds_appcobro/api/services/RecibosServices.dart';
 import 'package:ds_appcobro/database/AppDatabase.dart';
-import 'package:ds_appcobro/database/dao/PrestamosDao.dart';
-import 'package:ds_appcobro/database/dao/RecibosDao.dart';
-import 'package:ds_appcobro/database/dao/SecuenciasDao.dart';
 import 'package:ds_appcobro/database/dao/SystemSettingDao.dart';
 import 'package:ds_appcobro/managers/PrinterManager.dart';
+import 'package:ds_appcobro/managers/ReciboManager.dart';
 import 'package:ds_appcobro/utils/Utils.dart';
 import 'package:ds_appcobro/widgets/DsWidgetSelector.dart';
 import 'package:ds_appcobro/widgets/Loader.dart';
@@ -31,8 +26,8 @@ class _ReciboViewState extends State<ReciboView> {
   Prestamo _prestamo;
   NumberFormat _numberFormat;
   TextEditingController _tcobrocontroller;
-  ImpresionReciboData _impresionReciboData;
   Recibo _recibo;
+  String _serial = "";
   int _efectivo = 1;
   Recibostate _currentstate;
   String _errormsg = '';
@@ -46,6 +41,8 @@ class _ReciboViewState extends State<ReciboView> {
   }
 
   void _salvar(BuildContext context) async {
+    var recibomanager = Provider.of<ReciboManager>(context);
+
     if (_tcobrocontroller.text.isEmpty || _tcobrocontroller.text == '') {
       mensaje(context, "Debe digitar el monto a cobrar!");
       return;
@@ -55,24 +52,22 @@ class _ReciboViewState extends State<ReciboView> {
       mensaje(context, "El monto a cobrar es incorrecto!");
       return;
     }
-    var serial = '';
+    _serial = "";
     setState(() {
       _currentstate = Recibostate.savingstate;
     });
     Map<String, dynamic> distribucion;
     try {
-      var secuenciadao = Provider.of<SecuenciasDao>(context);
-      var prestamodao = Provider.of<PrestamosDao>(context);
       var sistemsetting =
           await Provider.of<SystemSettingDao>(context).getSystemSetting();
       var cobrador = System().currentcobrador;
       var deviceid = '';
       var tipodoc = "RM";
-
-      var pagares = await prestamodao.getPrestamoPagares(_prestamo.prestamoid);
+      var pagares =
+          await recibomanager.getPagaresPrestamo(_prestamo.prestamoid);
       if (pagares.isEmpty) {
         mensaje(context,
-            "Este prestamo no tiene detalle. \n No se puede completar el proceso");
+            "Este prestamo no tiene detalle, no se puede completar el proceso!");
         return;
       }
       var deviceinfo = DeviceInfoPlugin();
@@ -85,15 +80,15 @@ class _ReciboViewState extends State<ReciboView> {
       } else {
         deviceid = 'NO SUPPORT PLATFORM';
       }
-
-      var secuencia = await secuenciadao.getSecuencia(tipodoc, true);
+      var secuencia = await recibomanager.getSecuencia(tipodoc, true);
       var wholenum = right('0000000$secuencia', 7);
       var documento = '$tipodoc${cobrador.cobradorid}$wholenum';
-      serial = deviceid + documento;
+      _serial = deviceid + documento;
       distribucion = crearDistribucion(pagares, montoacobrar);
       _recibo = Recibo(
-          serial: serial,
+          serial: _serial,
           documento: documento,
+          idcliente: _prestamo.idcliente,
           fecha: sistemsetting.fechaop,
           prestamoid: _prestamo.prestamoid,
           monto: montoacobrar,
@@ -110,7 +105,7 @@ class _ReciboViewState extends State<ReciboView> {
           idcobrador: cobrador.id,
           ladob: _prestamo.ladob,
           sincronizado: false);
-      var insert = await Provider.of<RecibosDao>(context).create(_recibo);
+      var insert = await recibomanager.createRecibo(_recibo);
       if (insert <= 0) {
         setState(() {
           _errormsg = 'No se pudo guardar el recibo intentelo de nuevo';
@@ -118,9 +113,7 @@ class _ReciboViewState extends State<ReciboView> {
         });
         return;
       }
-      prestamodao.setPrestamoCobrado(_prestamo.prestamoid);
-      _impresionReciboData = ImpresionReciboData(System().empresa,
-          System().setting, System().currentcobrador, _prestamo, _recibo);
+      recibomanager.setPrestamoCobrado(_prestamo.prestamoid);
     } on PlatformException catch (ex) {
       setState(() {
         _errormsg = ex.toString();
@@ -139,7 +132,7 @@ class _ReciboViewState extends State<ReciboView> {
       setState(() {
         _currentstate = Recibostate.imprimiendo;
       });
-      await _imprimir(_impresionReciboData);
+      await _imprimir(context, _serial);
     } on PlatformException catch (ex) {
       setState(() {
         _errormsg = ex.toString();
@@ -159,7 +152,7 @@ class _ReciboViewState extends State<ReciboView> {
         setState(() {
           _currentstate = Recibostate.sincronizando;
         });
-        await _enviarRecibo(_recibo, _prestamo);
+        await recibomanager.enviarRecibo(_serial);
       } catch (ex) {
         setState(() {
           _errormsg = ex.toString();
@@ -175,35 +168,13 @@ class _ReciboViewState extends State<ReciboView> {
     Navigator.of(context).pop();
   }
 
-  Future<Null> _imprimir(ImpresionReciboData impresionReciboData) async {
-    var printmanager = PrinterManager();
-    await printmanager.printRecibo(impresionReciboData);
-  }
-
-  Future<Null> _enviarRecibo(Recibo recibo, Prestamo prestamo) async {
-    var recibom = RecibosM(
-        serial: recibo.serial,
-        documento: recibo.documento,
-        monto: recibo.monto,
-        idcliente: prestamo.idcliente,
-        concepto: recibo.concepto,
-        efectivo: recibo.efectivo,
-        fecha: DateFormat("yyyy-MM-dd").format(recibo.fecha),
-        prestamoid: prestamo.prestamoid,
-        requesttag: this.runtimeType.toString() + DateTime.now().toString(),
-        telcob: System().currentcobrador.telefono);
-    var services = Provider.of<RecibosServices>(context);
-    var reciboresult = await services.enviarRecibo(recibom);
-    if (reciboresult.insertado) {
-      Provider.of<RecibosDao>(context)
-          .setReciboSincronizado(reciboresult.serial);
-    } else {
-      throw Exception("No se pudo sincronizar el recibo");
-    }
+  Future<Null> _imprimir(BuildContext context, String serial) async {
+    var printmanager = Provider.of<PrinterManager>(context);
+    await printmanager.printRecibo(serial);
   }
 
   Map<String, dynamic> crearDistribucion(List<Pagare> pagares, double acobrar) {
-    var pagareinicial = pagares.first.pagare;
+    var pagareinicial = 0;
     var pagaretotal = _prestamo.duracion;
     var pagarefinal = 0;
     var capital = 0.0;
@@ -216,22 +187,27 @@ class _ReciboViewState extends State<ReciboView> {
     var pagando = acobrar;
     if (System().empresa.primeromora) {
       for (var pagare in pagares) {
-        if (pagando > pagare.mora) {
-          abono = true;
-          mora += pagare.mora;
-          pagando -= pagare.mora;
-        } else {
-          abono = true;
-          mora += pagando;
-          pagando = 0;
+        if (pagare.mora > 0) {
+          if (pagando >= pagare.mora) {
+            abono = true;
+            mora += pagare.mora;
+            pagando -= pagare.mora;
+          } else {
+            abono = true;
+            mora += pagando;
+            pagando = 0;
+          }
+          if (pagando == 0) break;
         }
-        if (pagando == 0) break;
       }
       if (pagando > 0) {
         for (var pagare in pagares) {
           var bal = pagare.capital + pagare.interes + pagare.comision;
-          if (pagando > bal) {
+          if (pagando >= bal) {
             saldo = true;
+            if (pagareinicial == 0) {
+              pagareinicial = pagare.pagare;
+            }
             pagarefinal = pagare.pagare;
             cuotaspagadas++;
             capital += pagare.capital;
@@ -273,9 +249,12 @@ class _ReciboViewState extends State<ReciboView> {
       }
     } else {
       for (var pagare in pagares) {
-        if (pagando > pagare.balance) {
+        if (pagando >= pagare.balance) {
           saldo = true;
           cuotaspagadas++;
+          if (pagareinicial == 0) {
+            pagareinicial = pagare.pagare;
+          }
           capital += pagare.capital;
           interes += pagare.interes;
           comision += pagare.comision;
@@ -757,7 +736,7 @@ class _ReciboViewState extends State<ReciboView> {
                               setState(() {
                                 _currentstate = Recibostate.imprimiendo;
                               });
-                              await _imprimir(_impresionReciboData);
+                              await _imprimir(context,_serial);
                             } on PlatformException catch (ex) {
                               setState(() {
                                 _errormsg = ex.toString();
@@ -777,7 +756,8 @@ class _ReciboViewState extends State<ReciboView> {
                                 setState(() {
                                   _currentstate = Recibostate.sincronizando;
                                 });
-                                await _enviarRecibo(_recibo, _prestamo);
+                                await Provider.of<ReciboManager>(context)
+                                    .enviarRecibo(_recibo.serial);
                               } catch (ex) {
                                 setState(() {
                                   _errormsg = ex.toString();
@@ -790,6 +770,34 @@ class _ReciboViewState extends State<ReciboView> {
                               _currentstate = Recibostate.donestate;
                             });
 
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        FlatButton(
+                          textColor: Theme.of(context).accentColor,
+                          child: Text("Omitir"),
+                          onPressed: () async {
+                            if (System().setting.online) {
+                              try {
+                                setState(() {
+                                  _currentstate = Recibostate.sincronizando;
+                                });
+                                await Provider.of<ReciboManager>(context)
+                                    .enviarRecibo(_recibo.serial);
+                              } catch (ex) {
+                                setState(() {
+                                  _errormsg = ex.toString();
+                                  _currentstate = Recibostate.sincronizarerror;
+                                });
+                                return;
+                              }
+                            }
+                            setState(() {
+                              _currentstate = Recibostate.donestate;
+                            });
                             Navigator.of(context).pop();
                           },
                         )
@@ -837,7 +845,8 @@ class _ReciboViewState extends State<ReciboView> {
                               setState(() {
                                 _currentstate = Recibostate.sincronizando;
                               });
-                              await _enviarRecibo(_recibo, _prestamo);
+                              await Provider.of<ReciboManager>(context)
+                                  .enviarRecibo(_recibo.serial);
                             } catch (ex) {
                               setState(() {
                                 _errormsg = ex.toString();
