@@ -1,6 +1,7 @@
 import 'package:ds_appcobro/database/AppDatabase.dart';
 import 'package:ds_appcobro/database/entity/Recibos.dart';
 import 'package:ds_appcobro/database/entity/SystemSettings.dart';
+import 'package:ds_appcobro/models/RecibosDto.dart';
 import 'package:moor_flutter/moor_flutter.dart';
 
 part 'RecibosDao.g.dart';
@@ -38,10 +39,9 @@ class RecibosDao extends DatabaseAccessor<AppDatabase> with _$RecibosDaoMixin {
   Future<int> getTotalRecibosHoy() async {
     var setting =
         await (select(systemSettings)..where((s) => s.id.equals(1))).get();
-    var fechaop=setting.isEmpty?DateTime.now():setting.first.fechaop;    
-    var res = await (select(recibos)
-          ..where((r) => r.fecha.equals(fechaop)))
-        .get();
+    var fechaop = setting.isEmpty ? DateTime.now() : setting.first.fechaop;
+    var res =
+        await (select(recibos)..where((r) => r.fecha.equals(fechaop))).get();
     return res.length;
   }
 
@@ -55,14 +55,15 @@ class RecibosDao extends DatabaseAccessor<AppDatabase> with _$RecibosDaoMixin {
   Stream<List<Recibo>> watchRecNoSinc() =>
       (select(recibos)..where((r) => r.sincronizado.equals(false))).watch();
 
-  Future<List<Recibo>> getRecibosByDateRange(
-          DateTime fecha1, DateTime fecha2) =>
-      (select(recibos)
+  Future<List<RecibosDto>> getRecibosByDateRange(DateTime fecha1, DateTime fecha2)async{
+    var result=await(select(recibos)
             ..where((r) => r.fecha.isBiggerOrEqualValue(fecha1))
             ..where((r) => r.fecha.isSmallerOrEqualValue(fecha2))
             ..orderBy([
               (r) => OrderingTerm(expression: r.fecha),
               (r) => OrderingTerm(expression: r.serial, mode: OrderingMode.desc)
-            ]))
-          .get();
+            ])).get();
+    return result.map<RecibosDto>((row)=>RecibosDto(row)).toList();
+  }
+
 }

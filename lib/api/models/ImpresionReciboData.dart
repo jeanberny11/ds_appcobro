@@ -1,10 +1,11 @@
 import 'package:ds_appcobro/database/AppDatabase.dart';
+import 'package:ds_appcobro/models/PrestamoDto.dart';
 
 class ImpresionReciboData {
   final Empresa _empresa;
   final Setting _setting;
   final Cobrador _cobrador;
-  final Prestamo _prestamo;
+  final PrestamoDto _prestamo;
   final Recibo _recibo;
 
   ImpresionReciboData(this._empresa, this._setting,this._cobrador,

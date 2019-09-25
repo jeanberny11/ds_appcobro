@@ -1,10 +1,7 @@
 import 'package:ds_appcobro/System.dart';
-import 'package:ds_appcobro/api/models/ImpresionReciboData.dart';
-import 'package:ds_appcobro/database/AppDatabase.dart';
-import 'package:ds_appcobro/database/dao/CobradorDao.dart';
-import 'package:ds_appcobro/database/dao/PrestamosDao.dart';
 import 'package:ds_appcobro/database/dao/RecibosDao.dart';
 import 'package:ds_appcobro/managers/PrinterManager.dart';
+import 'package:ds_appcobro/models/RecibosDto.dart';
 import 'package:ds_appcobro/utils/Utils.dart';
 import 'package:ds_appcobro/widgets/DsWidgetSelector.dart';
 import 'package:ds_appcobro/widgets/Loader.dart';
@@ -137,7 +134,7 @@ class _ReimprimirViewState extends State<ReimprimirView> {
               ),
             ),
             Expanded(
-              child: FutureBuilder<List<Recibo>>(
+              child: FutureBuilder<List<RecibosDto>>(
                 future: Provider.of<RecibosDao>(context)
                     .getRecibosByDateRange(_fecha1, _fecha2),
                 builder: (context, snp) {
@@ -162,6 +159,7 @@ class _ReimprimirViewState extends State<ReimprimirView> {
                             ? 1
                             : snp.data.length,
                         itemBuilder: (context, index) {
+                          var item = snp.data[index];
                           return Card(
                             elevation: 8,
                             child: Container(
@@ -174,7 +172,7 @@ class _ReimprimirViewState extends State<ReimprimirView> {
                                   Row(
                                     children: <Widget>[
                                       TextBold("Serial: "),
-                                      Text(snp.data[index].serial)
+                                      Text(item.serial)
                                     ],
                                   ),
                                   SizedBox(
@@ -183,7 +181,7 @@ class _ReimprimirViewState extends State<ReimprimirView> {
                                   Row(
                                     children: <Widget>[
                                       TextBold("Documento: "),
-                                      Text(snp.data[index].documento)
+                                      Text(item.documento)
                                     ],
                                   ),
                                   SizedBox(
@@ -192,29 +190,17 @@ class _ReimprimirViewState extends State<ReimprimirView> {
                                   Row(
                                     children: <Widget>[
                                       TextBold("Prestamo: "),
-                                      Text(snp.data[index].prestamoid)
+                                      Text(item.prestamoid)
                                     ],
                                   ),
                                   SizedBox(
                                     height: 10,
                                   ),
-                                  FutureBuilder<Prestamo>(
-                                    future: Provider.of<PrestamosDao>(context)
-                                        .getPrestamo(
-                                            snp.data[index].prestamoid),
-                                    builder: (context, snp2) {
-                                      if (snp2.connectionState ==
-                                          ConnectionState.done) {
-                                        return Row(
-                                          children: <Widget>[
-                                            TextBold("Cliente: "),
-                                            Text(snp2.data.nombre)
-                                          ],
-                                        );
-                                      } else {
-                                        return Container();
-                                      }
-                                    },
+                                  Row(
+                                    children: <Widget>[
+                                      TextBold("Cliente: "),
+                                      Text(item.idcliente.toString())
+                                    ],
                                   ),
                                   SizedBox(
                                     height: 10,
@@ -223,7 +209,7 @@ class _ReimprimirViewState extends State<ReimprimirView> {
                                     children: <Widget>[
                                       TextBold("Fecha: "),
                                       Text(DateFormat('dd-MM-yyyy')
-                                          .format(snp.data[index].fecha))
+                                          .format(item.fecha))
                                     ],
                                   ),
                                   SizedBox(
@@ -233,7 +219,7 @@ class _ReimprimirViewState extends State<ReimprimirView> {
                                     children: <Widget>[
                                       TextBold("Monto: "),
                                       Text(NumberFormat('###,###,##0.00')
-                                          .format(snp.data[index].monto))
+                                          .format(item.monto))
                                     ],
                                   ),
                                   SizedBox(
@@ -242,36 +228,38 @@ class _ReimprimirViewState extends State<ReimprimirView> {
                                   Row(
                                     children: <Widget>[
                                       TextBold("Concepto: "),
-                                      Flexible(
-                                          child: Text(snp.data[index].concepto))
+                                      Flexible(child: Text(item.concepto))
                                     ],
                                   ),
                                   SizedBox(
                                     height: 10,
                                   ),
                                   IconButton(
-                                    icon: Icon(Icons.print),
+                                    icon: Icon(
+                                      Icons.print,
+                                      color: Theme.of(context).accentColor,
+                                    ),
                                     onPressed: () async {
-                                      var prestamo =
-                                          await Provider.of<PrestamosDao>(
-                                                  context)
-                                              .getPrestamo(
-                                                  snp.data[index].prestamoid);
+                                      /*var p = await Provider.of<PrestamosDao>(
+                                              context)
+                                          .getPrestamoDto(item.prestamoid);
                                       var cobrador =
                                           await Provider.of<CobradorDao>(
                                                   context)
-                                              .getCobrador(
-                                                  snp.data[index].idcobrador);
+                                              .getCobrador(item.idcobrador);
+                                      var recibo =
+                                          await Provider.of<RecibosDao>(context)
+                                              .getRecibo(item.serial);
                                       var impresiondata = ImpresionReciboData(
                                           System().empresa,
                                           System().setting,
                                           cobrador,
-                                          prestamo,
-                                          snp.data[index]);
+                                          PrestamoDto.fromEntity(p),
+                                          recibo);*/
                                       try {
-                                        var printmanager = PrinterManager();
+                                        var printmanager = Provider.of<PrinterManager>(context);
                                         await printmanager
-                                            .printRecibo(impresiondata);
+                                            .printRecibo(item.serial);
                                       } on PlatformException catch (ex) {
                                         mensaje(context, ex.toString());
                                       } on Exception catch (ex) {

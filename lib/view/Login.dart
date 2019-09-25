@@ -8,9 +8,11 @@ import 'package:ds_appcobro/utils/PagesRoute.dart';
 import 'package:ds_appcobro/utils/Utils.dart';
 import 'package:ds_appcobro/widgets/DsWidgetSelector.dart';
 import 'package:ds_appcobro/widgets/Loader.dart';
+import 'package:ds_appcobro/widgets/TextBold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -19,12 +21,14 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   var _formkey = GlobalKey<FormState>();
+  final _usuarioreckey = 'REMENBEREDUSER';
   TextEditingController _usernamecontroller;
   TextEditingController _passwordcontroller;
   FocusNode _usefocus;
   FocusNode _passwordfocus;
   bool _isloading;
   bool _obscuretext = true;
+  bool _recordar;
 
   void _autenticar(BuildContext context) async {
     if (_formkey.currentState.validate()) {
@@ -52,24 +56,29 @@ class _LoginState extends State<Login> {
       var setting = await Provider.of<SettingDao>(context).findById(1);
       if (setting != null) {
         await Provider.of<ApiClient>(context).init(
-          setting.internet ? setting.remoteurl : setting.localurl,
-          setting.apiclient,
-          setting.apikey);
+            setting.internet ? setting.remoteurl : setting.localurl,
+            setting.apiclient,
+            setting.apikey);
         System().loadSetting(setting);
       }
-      var empresa= await Provider.of<EmpresaDao>(context).findById(1);
-      if(empresa!=null){
+      var empresa = await Provider.of<EmpresaDao>(context).findById(1);
+      if (empresa != null) {
         System().loadEmpresa(empresa);
       }
 
-      var cobrador=await Provider.of<CobradorDao>(context).getDefaultCobrador(usuario.usuarioid);
-      if(cobrador!=null){
+      var cobrador = await Provider.of<CobradorDao>(context)
+          .getDefaultCobrador(usuario.usuarioid);
+      if (cobrador != null) {
         System().loadCobrador(cobrador);
       }
 
       setState(() {
         _isloading = false;
       });
+      if (_recordar) {
+        var sharedpreference = await SharedPreferences.getInstance();
+        sharedpreference.setString(_usuarioreckey, _usernamecontroller.text);
+      }
       Navigator.of(context).pushReplacementNamed(PageRoutes.homeroute);
     }
   }
@@ -83,6 +92,19 @@ class _LoginState extends State<Login> {
     _passwordcontroller = TextEditingController();
     _usefocus = FocusNode();
     _passwordfocus = FocusNode();
+    _recordar = false;
+    _verificarUsuarioRec();
+  }
+
+  void _verificarUsuarioRec() async {
+    var sharedpreference = await SharedPreferences.getInstance();
+    var userrec = sharedpreference.getString(_usuarioreckey);
+    if (userrec != null) {
+      setState(() {
+        _usernamecontroller.text = userrec;
+        _recordar = true;
+      });
+    }
   }
 
   @override
@@ -241,8 +263,22 @@ class _LoginState extends State<Login> {
                           )),
                     ),
                   ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      Checkbox(
+                        value: _recordar,
+                        onChanged: (value) {
+                          setState(() {
+                            _recordar = value;
+                          });
+                        },
+                      ),
+                      TextBold("Recordar usuario")
+                    ],
+                  ),
                   SizedBox(
-                    height: 50,
+                    height: 10,
                   ),
                   _isloading
                       ? Loader(
@@ -360,7 +396,7 @@ class _LoginState extends State<Login> {
                     ),
                   ),
                   SizedBox(
-                    height: 20,
+                    height: 10,
                   ),
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 10),
@@ -408,8 +444,19 @@ class _LoginState extends State<Login> {
                           )),
                     ),
                   ),
-                  SizedBox(
-                    height: 35,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      Checkbox(
+                        value: _recordar,
+                        onChanged: (value) {
+                          setState(() {
+                            _recordar = value;
+                          });
+                        },
+                      ),
+                      TextBold("Recordar usuario")
+                    ],
                   ),
                   _isloading
                       ? Loader(

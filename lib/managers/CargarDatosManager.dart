@@ -45,6 +45,7 @@ class CargarDatosManager extends ChangeNotifier {
 
     await _dao.deleteAllPrestamos();
     await _dao.deleteAllPagares();
+    //await _dao.deleteAllClientes();
 
     _mensaje = 'Descargando los prestamos...';
     notifyListeners();
@@ -59,31 +60,36 @@ class CargarDatosManager extends ChangeNotifier {
       for (var p in prestamoslist) {
         _mensaje = 'Insertando $index de ${prestamoslist.length}...';
         notifyListeners();
-        var h = p.header;
-        var d = p.detalle;
+        var pres=p.prestamo;
+        var pag=p.pagares;
         var prestamo = Prestamo(
-            prestamoid: h.prestamoid,
-            idprestamo: h.idprestamo,
-            idcliente: h.idcliente,
-            nombre: h.nombre,
-            direccion: h.direccion,
-            monto: h.monto,
-            balance: h.balance,
-            duracion: h.duracion,
-            cuota: h.cuota,
-            cuotasvenc: h.cuotasvenc,
-            montovencido: h.montovencido,
-            ultimacuota: h.ultimacuota,
-            balancecuota: h.balancecuota,
-            mora: h.mora,
-            ladob: h.ladob,
+            prestamoid: pres.prestamoid,
+            idprestamo: pres.idprestamo,
+            idcliente: pres.idcliente,
+            monto: pres.monto,
+            balance: pres.balance,
+            duracion: pres.duracion,
+            cuota: pres.cuota,
+            formapago: pres.formapago,
+            nombre: pres.nombre,
+            direccion: pres.direccion,
+            cedula: pres.cedula,
+            telefono: pres.telefono,
+            sexo: pres.sexo,
+            cobradorid: pres.cobradorid,
+            fecha: pres.fecha,
+            cuotasvenc: pres.cuotasvenc,
+            montovencido: pres.montovencido,
+            ultimacuota: pres.ultimacuota,
+            balancecuota: pres.balancecuota,
+            mora: pres.mora,
+            ladob: pres.ladob,
             cobrado: false);
-        var pagareslist = d
-            .map<Pagare>((detalle) => Pagare(
+        var pagareslist = pag.map<Pagare>((detalle) => Pagare(
                 prestamoid: detalle.prestamoid,
                 fechavenc: detalle.fechav,
                 idpagare: detalle.idpagare,
-                cuota: detalle.cuota,
+                monto: detalle.monto,
                 capital: detalle.capital,
                 interes: detalle.interes,
                 comision: detalle.comision,
@@ -92,6 +98,7 @@ class CargarDatosManager extends ChangeNotifier {
                 pagare: detalle.pagare))
             .toList();
         await _dao.createPrestamo(prestamo);
+        //await _dao.createCliente(cliente);
         await _dao.createAllPagares(pagareslist);
         index++;
       }

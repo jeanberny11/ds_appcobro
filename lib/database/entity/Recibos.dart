@@ -4,6 +4,7 @@ class Recibos extends Table{
   TextColumn get serial=>text().withLength(max: 100)();
   TextColumn get documento=>text().withLength(max: 15)();
   TextColumn get prestamoid=>text().withLength(max: 15)();
+  IntColumn get idcliente=>integer()();
   DateTimeColumn get fecha=>dateTime()();
   IntColumn get idcobrador=>integer()();
   RealColumn get monto=>real()();
